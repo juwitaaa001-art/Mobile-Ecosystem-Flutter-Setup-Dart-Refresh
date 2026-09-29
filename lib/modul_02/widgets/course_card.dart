@@ -1,139 +1,154 @@
 import 'package:flutter/material.dart';
-
 import '../models/course.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
 
-  const CourseCard({super.key, required this.course});
+  const CourseCard({
+    super.key,
+    required this.course,
+  });
+
+  Color statusColor() {
+    switch (course.status) {
+      case "Berlangsung":
+        return Colors.green;
+
+      case "Akan datang":
+        return Colors.blue;
+
+      case "Selesai":
+        return Colors.grey;
+
+      case "Tersedia":
+        return Colors.teal;
+
+      default:
+        return Colors.black;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      // Pakai Stack agar badge SKS bisa menimpa pojok kanan atas kartu
-      child: Stack(
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
         children: [
-          // Konten utama kartu
-          Padding(
-            padding: const EdgeInsets.all(16.0),
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: const Color(0xffEAF3FF),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(
+              course.icon,
+              color: const Color(0xff2F80ED),
+              size: 36,
+            ),
+          ),
+
+          const SizedBox(width: 16),
+
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  course.code,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.8,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 5,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusColor().withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    course.status,
+                    style: TextStyle(
+                      color: statusColor(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 6),
 
-                // Batasi judul maksimal 2 baris agar tinggi kartu tetap konsisten
-                Text(
-                  course.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
                 const SizedBox(height: 10),
 
-                // Info dosen pengampu
+                Text(
+                  course.title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xff173B72),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
                 Row(
                   children: [
-                    Icon(
-                      Icons.person_outline,
+                    const Icon(
+                      Icons.location_on,
                       size: 16,
-                      color: theme.colorScheme.onSurfaceVariant,
+                      color: Colors.grey,
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        course.lecturer,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
+                    const SizedBox(width: 4),
+                    Text(
+                      course.lab,
+                      style: const TextStyle(
+                        color: Colors.grey,
                       ),
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 4),
 
-                // Ruang kelas/lab
-                Row(
-                  children: [
-                    Icon(
-                      Icons.meeting_room_outlined,
-                      size: 16,
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      course.room,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                if (course.assistant.isNotEmpty)
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.people,
+                        size: 16,
+                        color: Colors.grey,
                       ),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-
-                // Progress bar silabus
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Progres Sesi', style: theme.textTheme.labelSmall),
-                        Text(
-                          '${(course.progress * 100).toInt()}%',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          ),
+                      const SizedBox(width: 4),
+                      Text(
+                        course.assistant,
+                        style: const TextStyle(
+                          color: Colors.grey,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    LinearProgressIndicator(
-                      value: course.progress,
-                      borderRadius: BorderRadius.circular(4),
-                      minHeight: 6,
-                    ),
-                  ],
-                ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
 
-          // Badge SKS di pojok kanan atas
-          Positioned(
-            top: 12,
-            right: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
+          if (course.time.isNotEmpty)
+            Align(
+              alignment: Alignment.topRight,
               child: Text(
-                '${course.sks} SKS',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onPrimaryContainer,
-                  fontWeight: FontWeight.bold,
+                course.time,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: Color(0xff667085),
                 ),
               ),
             ),
-          ),
         ],
       ),
     );
